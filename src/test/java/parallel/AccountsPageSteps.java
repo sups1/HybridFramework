@@ -8,11 +8,13 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class AccountsPageSteps {
-
+    private static final Logger logger = LoggerFactory.getLogger(AccountsPageSteps.class);
     private Hooks hooks;
     private LoginPage loginPage;
     private AccountsPage accPage;
@@ -29,16 +31,19 @@ public class AccountsPageSteps {
     @Given("the user is logged in and on the accounts page")
     public void the_user_is_logged_in_and_on_the_accounts_page() {
         accPage = loginPage.doLogin(hooks.getProperties().getProperty("username"), hooks.getProperties().getProperty("password"));
+        logger.info("user logged in on account page ");
     }
 
 
     @When("the user checks the page headers")
     public void the_user_checks_the_page_headers() {
         headers = accPage.getAccPageHeaders();
+        logger.info("user checked page header ");
     }
 
     @Then("the page headers should be:")
     public void the_page_headers_should_be(DataTable expectedHeadersTable) {
+        //datatable ---> List<String>
         List<String> expectedHeaders = expectedHeadersTable.asList();
         Assert.assertEquals(expectedHeaders, headers);
     }

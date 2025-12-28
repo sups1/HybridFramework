@@ -6,6 +6,8 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import org.openqa.selenium.WebDriver;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class Hooks {
@@ -39,7 +41,16 @@ public class Hooks {
     }
 
     public Properties getProperties() {
-
         return prop;
+    }
+
+    private Map<String, Object> scenarioData = new HashMap<>();
+
+    public void setScenarioData(String key, Object value) {
+        scenarioData.put(key, value);
+    }
+
+    public Object getScenarioData(String key) {
+        return scenarioData.get(key);
     }
 }

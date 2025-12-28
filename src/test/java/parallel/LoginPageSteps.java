@@ -12,7 +12,8 @@ public class LoginPageSteps {
 
     private LoginPage loginPage;
     private AccountsPage accPage;
-    private Hooks hooks;
+
+    String actTitle;
 
     public LoginPageSteps(Hooks hooks) {
         this.loginPage = hooks.getLoginPage();
@@ -23,17 +24,23 @@ public class LoginPageSteps {
         // Assuming the driver is already on the login page
     }
 
-    @When("the user checks the page title")
-    public void the_user_checks_the_page_title() {
-        String actTitle = loginPage.getLoginPageTitle();
-        Assert.assertEquals(actTitle, AppConstants.LOGIN_PAGE_TITLE);
+    @When("the user fetches the page title")
+    public void the_user_fetches_the_page_title() {
+        actTitle = loginPage.getLoginPageTitle();
     }
 
     @Then("the page title should be {string}")
     public void the_page_title_should_be(String expectedTitle) {
-        String actTitle = loginPage.getLoginPageTitle();
+        actTitle = loginPage.getLoginPageTitle();
         Assert.assertEquals(actTitle, expectedTitle);
     }
+
+    @Then("the page title should not be empty")
+    public void the_page_title_should_not_be_empty() {
+        Assert.assertFalse("Page title should not be empty", actTitle.isEmpty());
+    }
+
+
 
     @When("the user checks the page URL")
     public void the_user_checks_the_page_url() {
