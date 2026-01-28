@@ -6,8 +6,8 @@
 
 
     <listeners>
-          <listener class-name="com.qa.opencart.listeners.TestAllureListener" />
-          <listener class-name="com.qa.opencart.listeners.AnnotationTransformer" />
+          <listener class-name="listeners.TestAllureListener" />
+          <listener class-name="listeners.AnnotationTransformer" />
     </listeners>
 
     <test name="Scenario">
@@ -84,8 +84,5 @@
 
     <!-- <test name="Register Page Test"> <classes> <class name="com.qa.opencart.tests.RegisterPageTest"
         /> </classes> </test> -->
-
-
-
 
 </suite>

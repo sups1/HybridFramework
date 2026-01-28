@@ -1,4 +1,4 @@
-package com.qa.opencart.listeners;
+package listeners;
 
 
 import io.qameta.allure.Attachment;
