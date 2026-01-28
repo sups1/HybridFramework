@@ -10,10 +10,11 @@ pipeline {
     }
 
     stages {
+
         stage('Build') {
             steps {
-                git 'https://github.com/jglick/simple-maven-project-with-tests.git'
-                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                checkout scm
+                bat "mvn -Dmaven.test.failure.ignore=true clean package"
             }
             post {
                 success {
@@ -35,13 +36,6 @@ pipeline {
             steps {
                 echo "deploy to Dev"
             }
-            post {
-                failure {
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
-            }
         }
 
         stage("Deploy to QA") {
@@ -49,14 +43,7 @@ pipeline {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                echo "deploy to qa"
-            }
-            post {
-                failure {
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
+                echo "deploy to QA"
             }
         }
 
@@ -66,42 +53,34 @@ pipeline {
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    git 'https://github.com/naveenanimation20/Feb2024POMSeries.git'
-                    sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/test_regression.xml"
-                }
-            }
-            post {
-                failure {
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
+                    bat "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/test_regression.xml"
                 }
             }
         }
 
         stage('Publish Allure Reports') {
             steps {
-                script {
-                    allure([
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: '/allure-results']]
-                    ])
-                }
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'allure-results']]
+                ])
             }
         }
 
         stage('Publish Extent Report') {
             steps {
-                publishHTML([allowMissing: false,
+                publishHTML([
+                    allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
                     reportDir: 'reports',
                     reportFiles: 'TestExecutionReport.html',
                     reportName: 'HTML Regression Extent Report',
-                    reportTitles: ''])
+                    reportTitles: ''
+                ])
             }
         }
 
@@ -112,13 +91,6 @@ pipeline {
             steps {
                 echo "deploy to Stage"
             }
-            post {
-                failure {
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
-            }
         }
 
         stage('Run Sanity Automation Tests') {
@@ -127,37 +99,29 @@ pipeline {
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    git 'https://github.com/naveenanimation20/Feb2024POMSeries.git'
-                    sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/test_sanity.xml"
+                    bat "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/test_sanity.xml"
                 }
                 script {
-                    env.SANITY_TESTS_RAN = true
-                }
-            }
-            post {
-                failure {
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
+                    env.SANITY_TESTS_RAN = 'true'
                 }
             }
         }
 
-        stage('Publish sanity Extent Report') {
+        stage('Publish Sanity Extent Report') {
             when {
                 expression { env.SANITY_TESTS_RAN == 'true' }
             }
             steps {
-                publishHTML([allowMissing: false,
+                publishHTML([
+                    allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
                     reportDir: 'reports',
                     reportFiles: 'TestExecutionReport.html',
                     reportName: 'HTML Sanity Extent Report',
-                    reportTitles: ''])
+                    reportTitles: ''
+                ])
             }
         }
     }
-
-    
 }
